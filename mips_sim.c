@@ -1,22 +1,20 @@
-// COMP1521 20T3 Assignment 1: mips_sim -- a MIPS simulator
-// starting point code v0.1 - 13/10/20
+////////////////////////////////////////////////////////////////////////////////
+// COMP1521 20T3 Assignment 1: mips_sim -- a MIPS simulator                   //
+// starting point code v0.1 - 13/10/20                                        //
+// -------------------------------------------------------------------------- //
+//                                        Completed by: Leon Qian [Oct 2020]  //
+////////////////////////////////////////////////////////////////////////////////
 
-
-// PUT YOUR HEADER COMMENT HERE
-
-
+#include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
-#include <errno.h>
 
 #define MAX_LINE_LENGTH 256
 #define INSTRUCTIONS_GROW 64
 
-
-// ADD YOUR #defines HERE
-
+#define REGISTER_COUNT 32
 
 void execute_instructions(int n_instructions,
                           uint32_t instructions[n_instructions],
@@ -24,7 +22,6 @@ void execute_instructions(int n_instructions,
 char *process_arguments(int argc, char *argv[], int *trace_mode);
 uint32_t *read_instructions(char *filename, int *n_instructions_p);
 uint32_t *instructions_realloc(uint32_t *instructions, int n_instructions);
-
 
 // ADD YOUR FUNCTION PROTOTYPES HERE
 
@@ -43,49 +40,42 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-
-// simulate execution of  instruction codes in  instructions array
+////////////////////////////////////////////////////////////////////////////////
+// simulate execution of instruction codes in instructions array
 // output from syscall instruction & any error messages are printed
 //
 // if trace_mode != 0:
 //     information is printed about each instruction as it executed
 //
 // execution stops if it reaches the end of the array
-
+//
 void execute_instructions(int n_instructions,
                           uint32_t instructions[n_instructions],
                           int trace_mode) {
-    // REPLACE CODE BELOW WITH YOUR CODE
-
+    uint32_t registers[REGISTER_COUNT];
     int pc = 0;
 
     while (pc < n_instructions) {
         if (trace_mode) {
             printf("%d: 0x%08X\n", pc, instructions[pc]);
         }
+
         pc++;
     }
 }
 
-
-
 // ADD YOUR FUNCTIONS HERE
-
-
 
 // YOU DO NOT NEED TO CHANGE CODE BELOW HERE
 
-
+////////////////////////////////////////////////////////////////////////////////
 // check_arguments is given command-line arguments
 // it sets *trace_mode to 0 if -r is specified
 //          *trace_mode is set to 1 otherwise
 // the filename specified in command-line arguments is returned
-
+//
 char *process_arguments(int argc, char *argv[], int *trace_mode) {
-    if (
-        argc < 2 ||
-        argc > 3 ||
-        (argc == 2 && strcmp(argv[1], "-r") == 0) ||
+    if (argc < 2 || argc > 3 || (argc == 2 && strcmp(argv[1], "-r") == 0) ||
         (argc == 3 && strcmp(argv[1], "-r") != 0)) {
         fprintf(stderr, "Usage: %s [-r] <file>\n", argv[0]);
         exit(1);
@@ -94,11 +84,11 @@ char *process_arguments(int argc, char *argv[], int *trace_mode) {
     return argv[argc - 1];
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
 // read hexadecimal numbers from filename one per line
 // numbers are return in a malloc'ed array
 // *n_instructions is set to size of the array
-
+//
 uint32_t *read_instructions(char *filename, int *n_instructions_p) {
     FILE *f = fopen(filename, "r");
     if (f == NULL) {
@@ -110,10 +100,10 @@ uint32_t *read_instructions(char *filename, int *n_instructions_p) {
     int n_instructions = 0;
     char line[MAX_LINE_LENGTH + 1];
     while (fgets(line, sizeof line, f) != NULL) {
-
         // grow instructions array in steps of INSTRUCTIONS_GROW elements
         if (n_instructions % INSTRUCTIONS_GROW == 0) {
-            instructions = instructions_realloc(instructions, n_instructions + INSTRUCTIONS_GROW);
+            instructions = instructions_realloc(
+                instructions, n_instructions + INSTRUCTIONS_GROW);
         }
 
         char *endptr;
@@ -132,12 +122,13 @@ uint32_t *read_instructions(char *filename, int *n_instructions_p) {
     return instructions;
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
 // instructions_realloc is wrapper for realloc
 // it calls realloc to grow/shrink the instructions array
-// to the speicfied size
+// to the specified size
 // it exits if realloc fails
 // otherwise it returns the new instructions array
+//
 uint32_t *instructions_realloc(uint32_t *instructions, int n_instructions) {
     instructions = realloc(instructions, n_instructions * sizeof *instructions);
     if (instructions == NULL) {
